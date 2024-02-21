@@ -1,11 +1,11 @@
 const express = require('express');
-const axios = require('axios');
 const bodyParser = require('body-parser');
-
+import cors from 'cors';
 const ConnectBD = require('./server/connectionDB')
 const Order = require('./models/pedido');
 
 const app = express();
+app.use(cors())
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
