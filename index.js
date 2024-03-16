@@ -3,25 +3,16 @@ const bodyParser = require('body-parser');
 import cors from 'cors';
 const ConnectBD = require('./server/connectionDB')
 const Order = require('./models/pedido');
+const corsConfig = require('./config/cors.config')
 
 const app = express();
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
 
-const whitelist = ['https://techfixfr.vercel.app', 'http://localhost:5173']; // Adicione os URLs dos sites permitidos aqui
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
-};
 
-app.use(cors(corsOptions)); // Usando o CORS com as opções de whitelist
+app.use(cors(corsConfig));
 
 app.get('/content/v1/orders', async (req, res) => {
     try {
