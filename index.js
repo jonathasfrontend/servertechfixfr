@@ -12,7 +12,13 @@ const app = express();
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
-app.use(cors(corsConfig));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE")
+  app.use(cors())
+  next()
+} )
+// app.use(cors(corsConfig));
 
 app.get('/content/v1/orders', async (req, res) => {
     try {
