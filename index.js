@@ -5,10 +5,16 @@ const ConnectBD = require('./server/connectionDB')
 const Order = require('./models/pedido');
 
 const app = express();
-app.use(cors())
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE")
+  app.use(cors())
+  next()
+} )
 
 app.get('/content/v1/orders', async (req, res) => {
     try {
