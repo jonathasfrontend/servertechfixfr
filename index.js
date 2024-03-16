@@ -3,14 +3,18 @@ const bodyParser = require('body-parser');
 import cors from 'cors';
 const ConnectBD = require('./server/connectionDB')
 const Order = require('./models/pedido');
-const corsConfig = require('./cors.config')
 
 const app = express();
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
 
-corsConfig
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE")
+  app.use(cors())
+  next()
+} )
 
 app.get('/content/v1/orders', async (req, res) => {
     try {
