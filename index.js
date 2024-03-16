@@ -1,17 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-import cors from 'cors';
+const cors = require('cors');
 const ConnectBD = require('./server/connectionDB')
-const Order = require('./models/pedido');
 const corsConfig = require('./config/cors.config')
+
+const Order = require('./models/pedido');
+const Status = require('./models/status');
+const Category = require('./models/category');
 
 const app = express();
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
-
-
-
 app.use(cors(corsConfig));
 
 app.get('/content/v1/orders', async (req, res) => {
@@ -53,6 +53,40 @@ app.post('/content/v1/neworders', async (req, res) => {
 
   } catch (error) {
     
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+})
+
+app.get('/content/v1/status', async (req, res) => {
+  try {
+    const [ status ] = await Promise.all([
+      Status.find(),
+    ]);
+  
+    const responseData = {
+      status
+    };
+  
+    res.status(200).json(responseData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+})
+
+app.get('/content/v1/category', async (req, res) => {
+  try {
+    const [ category ] = await Promise.all([
+      Category.find(),
+    ]);
+  
+    const responseData = {
+      category
+    };
+  
+    res.status(200).json(responseData);
+  } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
