@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const ConnectBD = require('./server/connectionDB')
-const corsConfig = require('./config/cors.config')
+// const corsConfig = require('./config/cors.config')
 
 const Order = require('./models/pedido');
 const Status = require('./models/status');
@@ -12,7 +12,7 @@ const app = express();
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
-app.use(cors(corsConfig));
+app.use(cors());
 
 app.get('/content/v1/orders', async (req, res) => {
     try {
