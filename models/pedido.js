@@ -16,10 +16,6 @@ const PostSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        cpf: {
-            type: String,
-            required: true
-        },
         email: {
             type: String,
             required: true

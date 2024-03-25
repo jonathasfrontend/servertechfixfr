@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const ConnectBD = require('./server/connectionDB')
-// const corsConfig = require('./config/cors.config')
+const corsConfig = require('./config/cors.config')
 
 const Order = require('./models/pedido');
 const Status = require('./models/status');
@@ -12,7 +12,7 @@ const app = express();
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
-app.use(cors());
+app.use(cors(corsConfig));
 
 app.get('/content/v1/orders', async (req, res) => {
     try {
@@ -30,6 +30,48 @@ app.get('/content/v1/orders', async (req, res) => {
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
 })
+
+app.get('/content/v1/orders/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if(!order){
+      return res.status(404).json({ error: 'Serviço não encontrado' });
+    }
+  
+    const responseData = {
+      order
+    };
+  
+    res.status(200).json(responseData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+})
+
+app.get('/content/v1/orders/status/:status', async (req, res) => {
+  try {
+    const status = req.params.status;
+    // Garante que o filtro seja aplicado ao campo 'status' corretamente
+    const orders = await Order.find({ status: status });
+
+    if (orders.length === 0) {
+      return res.status(404).json({ error: 'Nenhum pedido encontrado com esse status' });
+    }
+
+    const responseData = {
+      orders,
+    };
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+
 
 app.post('/content/v1/neworders', async (req, res) => {
   try {
