@@ -3,10 +3,14 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const ConnectBD = require('./server/connectionDB')
 const corsConfig = require('./config/cors.config')
+const pdf = require('html-pdf')
+const path = require('path')
 
 const Order = require('./models/pedido');
 const Status = require('./models/status');
 const Category = require('./models/category');
+const { default: puppeteer } = require('puppeteer');
+const ejs = require("ejs")
 
 const app = express();
 app.use( bodyParser.json() );
@@ -71,8 +75,6 @@ app.get('/content/v1/orders/status/:status', async (req, res) => {
   }
 });
 
-
-
 app.post('/content/v1/neworders', async (req, res) => {
   try {
     const { name, address, number, cpf, email, devicedescription, defectdescription, category, status} = req.body;
@@ -128,6 +130,65 @@ app.get('/content/v1/category', async (req, res) => {
     };
   
     res.status(200).json(responseData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+})
+
+
+
+
+app.get('/content/v1/pdf_html/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ error: 'Serviço não encontrado' });
+    }
+  
+    const responseData = { order };
+
+    const filePath = path.join(__dirname, "print.ejs");
+    ejs.renderFile(filePath, { data: responseData }, (err, data) => {
+      if (err) {
+        return res.send("Erro ao carregar o ejs");
+      }
+
+      return res.send(data);
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+
+
+app.get('/content/v1/orders_pdf/:id', async (req, res) => {
+  try {
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+    
+    // Aumenta o tempo de espera
+    await page.setDefaultNavigationTimeout(60000); // 60 segundos
+
+    await page.goto(`http://localhost:3000/content/v1/pdf_html/${req.params.id}`, {
+      waitUntil: 'networkidle0'
+    })
+
+    const pdf = await page.pdf({
+      printBackground: true,
+      format: 'Letter'
+    })
+  
+    await browser.close()
+
+    res.contentType("application/pdf")
+
+    return res.send(pdf)
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erro interno do servidor' });
