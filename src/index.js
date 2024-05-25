@@ -9,7 +9,7 @@ const path = require('path')
 const Order = require('./models/pedido');
 const Status = require('./models/status');
 const Category = require('./models/category');
-const { default: puppeteer } = require('puppeteer');
+const puppeteer = require('puppeteer');
 const ejs = require("ejs")
 
 const app = express();
@@ -17,6 +17,10 @@ app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded({ extended: true }) );
 require('dotenv').config()
 app.use(cors(corsConfig));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+app.use('/public', express.static(path.join(__dirname, 'public')));
+app.set('views', path.join(__dirname, '/pages'));
 
 app.get('/content/v1/orders', async (req, res) => {
     try {
@@ -149,14 +153,7 @@ app.get('/content/v1/pdf_html/:id', async (req, res) => {
   
     const responseData = { order };
 
-    const filePath = path.join(__dirname, "print.ejs");
-    ejs.renderFile(filePath, { data: responseData }, (err, data) => {
-      if (err) {
-        return res.send("Erro ao carregar o ejs");
-      }
-
-      return res.send(data);
-    });
+    return res.render('pdf', { data: responseData })
 
   } catch (error) {
     console.error(error);
@@ -164,15 +161,10 @@ app.get('/content/v1/pdf_html/:id', async (req, res) => {
   }
 });
 
-
-
 app.get('/content/v1/orders_pdf/:id', async (req, res) => {
   try {
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
-    
-    // Aumenta o tempo de espera
-    await page.setDefaultNavigationTimeout(60000); // 60 segundos
 
     await page.goto(`http://localhost:3000/content/v1/pdf_html/${req.params.id}`, {
       waitUntil: 'networkidle0'

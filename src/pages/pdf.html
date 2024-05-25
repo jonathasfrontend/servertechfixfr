@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document PDF Oders</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .title{
+            font-size: 30px;
+            font-weight: 900;
+        }
+        p{
+            font-size: 16px;
+        }
+        p span{
+            font-size: 18px;
+            font-weight: 600;
+        }
+        body{
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title"><%= data.order.name %></h1>
+    <p><span>Telefone:</span> <%= data.order.number %></p>
+    <p><span>Endereço:</span> <%= data.order.address %></p>
+    <p><span>Email:</span> <%= data.order.email %></p>
+    <p><span>Modelo:</span> <%= data.order.devicedescription %></p>
+    <p><span>Defeito:</span> <%= data.order.defectdescription %></p>
+    <p><span>Categoria:</span> <%= data.order.category %></p>
+    <p><span>Status:</span> <%= data.order.status %></p>
+    <p><span>Criado em:</span> <%= data.order.createdAt %></p>
+</body>
+</html>
